@@ -6,10 +6,30 @@ import { useState } from "react";
 
 export default function App() {
   const [projectState, setProjectState] = useState({
-    selectedProjectId: undefined, // ✅ renamed for clarity
+    selectedProjectId: undefined,
     projects: [],
+    tasks: [],
   });
-
+  function handleAddTask(text) {
+    setProjectState((prevState) => {
+      const taskID = Math.random();
+      const newTask = {
+        text: text,
+        projectID: prevState.selectedProjectId,
+        id: taskID,
+      };
+      return {
+        ...prevState,
+        tasks: [newTask, ...prevState.tasks],
+      };
+    });
+  }
+  function handleDeleteTask(id) {
+    setProjectState((prevState) => ({
+      ...prevState,
+      tasks: projectState.tasks.filter((task) => task.id !== id),
+    }));
+  }
   function handleAddingNewProject() {
     setProjectState((prevState) => ({
       ...prevState,
@@ -59,7 +79,13 @@ export default function App() {
   );
 
   let content = (
-    <SelectedProject project={selectedProject} onDelete={handleDeleteProject} />
+    <SelectedProject
+      project={selectedProject}
+      onDelete={handleDeleteProject}
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeleteTask}
+      tasks={projectState.tasks}
+    />
   );
 
   if (projectState.selectedProjectId === null) {
@@ -74,6 +100,7 @@ export default function App() {
         onAddingProject={handleAddingNewProject}
         projects={projectState.projects}
         onSelectProject={handleSelectProject}
+        selectedProjectId={projectState.selectedProjectId}
       />
       {content}
     </main>
